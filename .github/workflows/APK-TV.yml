@@ -10,24 +10,24 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          # 关键：拉取你自己的 fongmi 分支
-          ref: fongmi
 
-      - name: 赋予执行权限
+      # 关键：直接克隆你要编译的仓库 + 分支
+      - name: Clone 你的 fongmi 分支
+        run: git clone -b fongmi --depth=1 https://github.com/Zhongjie268/TV.git
+
+      - name: 编译 APK
         run: |
+          cd TV
           chmod +x gradlew
-          
-      - name: 开始编译 APK
-        run: |
           ./gradlew assembleleanbackRelease --build-cache --parallel --daemon --warning-mode all
 
-      - name: 整理 APK 文件
+      - name: 打包 APK
         run: |
           mkdir -p apk
-          find . -name "*.apk" -exec mv {} apk/ \;
+          find TV -name "*.apk" -exec mv {} apk/ \;
 
-      - name: 上传 APK 成品
+      - name: 上传成品
         uses: actions/upload-artifact@v4
         with:
-          name: tvbox-fongmi-apk
+          name: tvbox-fongmi
           path: apk/*
